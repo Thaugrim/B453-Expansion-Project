@@ -46,7 +46,7 @@ public class GameController : Interactive
         DefiningTimer();
     }
 
-    void FixedUpdate()
+    void FixedUpdate()  // This just runs the timer
     {
         if (runCounter)
         {
@@ -81,7 +81,7 @@ public class GameController : Interactive
             var orbsValue = _player.DeliveryOrb();
 
             orbsDeliveried += orbsValue;
-            if(orbsDeliveried >= 18)
+            if(orbsDeliveried >= 18)   // 18 orbs to win?
             {
                 runCounter = false;
                 return;
@@ -98,19 +98,19 @@ public class GameController : Interactive
 
         if (other.TryGetComponent<ColorInverter>(out ColorInverter _color))
         {
-            _color.ColorInvert(false);//Deixa os materiais pretos
+            _color.ColorInvert(false);//Deixa os materiais pretos  - Make the materials black
         }
     }
     void OnTriggerExit(Collider other)
     {
         if (other.TryGetComponent<ColorInverter>(out ColorInverter _color))
         {
-            _color.ColorInvert(true);//Deixa os materiais brancos
+            _color.ColorInvert(true);//Deixa os materiais brancos - Make the materials white
             
         }
     }
 
-    public override void TakeDmg()
+    public override void TakeDmg()  // I didn't even realize that taking damage reduced the timer
     {
         seconds -= 1;
     }
@@ -128,7 +128,7 @@ public class GameController : Interactive
             }
         }
     }
-    void DefiningTimer()
+    void DefiningTimer()  // This just reduces the timer as difficulty increases
     {
         this.secAAdd = 20 - (2 * difficuty);
         this.totalSeconds = 720 - (120 * difficuty);

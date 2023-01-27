@@ -88,9 +88,9 @@ public class PlayerController : Entity
         inputX = Input.GetAxisRaw("Vertical");
         inputY = Input.GetAxisRaw("Horizontal");
 
-        direction = (pivotCam.forward * inputX + pivotCam.right * inputY).normalized;
+        direction = (pivotCam.forward * inputX + pivotCam.right * inputY).normalized; // This handles movement direction
 
-        Ray camR = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray camR = Camera.main.ScreenPointToRay(Input.mousePosition);  // This gives the look direction and angle, but the actual angle seems to be off for shooting
         RaycastHit hit;
 
         Physics.Raycast(camR, out hit);
@@ -98,9 +98,9 @@ public class PlayerController : Entity
         //Verifica objetos interativos - Check interactive Objects
         if (hit.transform.TryGetComponent<InspectorBase>(out InspectorBase _obj))
         {
-            intButton.SetActive(true);
+            intButton.SetActive(true); // This displays the F (or interact key) when near an interactable object?
 
-            if (Input.GetKeyDown(KeyCode.F))
+            if (Input.GetKeyDown(KeyCode.F))  // I have not found an object to be interacted with yet
                 _obj.Interact();
         }
         else
@@ -108,7 +108,7 @@ public class PlayerController : Entity
 
         Physics.Raycast(camR, out hit, Mathf.Infinity, aMask);
         var lookPos = new Vector3(hit.point.x, gfx.transform.position.y, hit.point.z);
-        gfx.transform.LookAt(lookPos, Vector3.up);
+        gfx.transform.LookAt(lookPos, Vector3.up);  // This seems to turn the player model to the mouse pointer
 
         //Rotaciona a camera - Rotation of camera
         if (Input.GetMouseButton(2))
@@ -120,7 +120,7 @@ public class PlayerController : Entity
         }
 
         //Atirar - Shoot
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))  // Would be nice to have some sort of UI element for showing remaining bullets
         {
             if (bulletsCount <= 0 || !canShoot || defend)
                 return;
@@ -152,7 +152,7 @@ public class PlayerController : Entity
     void HandleMovement()
     {
         if (defend)
-            speed = actualSpeed / 2;
+            speed = actualSpeed / 2; // Speed is reduced by half if shielding
         else
             speed = actualSpeed;
 
@@ -166,7 +166,7 @@ public class PlayerController : Entity
                     this.transform.position += direction * speed * delta;
 
                 Quaternion target = Quaternion.Euler(inputX * 30f, 0, inputY * 30f);
-                basePlayer.transform.rotation = basePlayer.transform.rotation * Quaternion.Slerp(basePlayer.transform.rotation, target, Time.deltaTime);
+                basePlayer.transform.rotation = basePlayer.transform.rotation * Quaternion.Slerp(basePlayer.transform.rotation, target, Time.deltaTime); // Smooth movement to position
             }
         }
         
@@ -195,7 +195,7 @@ public class PlayerController : Entity
         }
     }
 
-    bool CanMove(Vector3 direction)
+    bool CanMove(Vector3 direction) // This seems to check if the move position is a valid movement position?
     {
         if (Physics.Raycast(this.transform.position, direction * 2f, out RaycastHit hit, 0.5f) &&
             Physics.Raycast(this.transform.position, direction * 2f + new Vector3(0.5f, 0, 0), out RaycastHit hit1, 0.5f) &&
@@ -210,7 +210,7 @@ public class PlayerController : Entity
             return true;
     }
 
-    IEnumerator Reload()
+    IEnumerator Reload()  // Effectively reloads 1 bullet every 3 seconds
     {
         reloading = true;
 
@@ -222,13 +222,13 @@ public class PlayerController : Entity
 
         reloading = false;
     }
-    IEnumerator CanJump()
+    IEnumerator CanJump() // If player is jumping, set to canJump to false, wait 1 second and reset to true
     {
         canJump = false;
         yield return new WaitForSeconds(1f);
         canJump = true;
     }
-    IEnumerator CanShoot()
+    IEnumerator CanShoot() // Shot delay 0.5 seconds
     {
         canShoot = false;
         yield return new WaitForSeconds(0.5f);

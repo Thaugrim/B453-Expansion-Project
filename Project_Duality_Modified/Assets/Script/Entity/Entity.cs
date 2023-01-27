@@ -29,7 +29,7 @@ public class Entity : Interactive
                 dead = true;
         }
     }
-    IEnumerator CanTakeDmg()
+    IEnumerator CanTakeDmg()  // Invincibility frames
     {
         canTakeDmg = false;
         yield return new WaitForSeconds(0.25f);

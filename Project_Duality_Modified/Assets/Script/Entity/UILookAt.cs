@@ -6,6 +6,6 @@ public class UILookAt : MonoBehaviour
 
     private void LateUpdate()
     {
-        transform.LookAt(transform.position + transfCamera.transform.rotation * Vector3.forward, transfCamera.transform.rotation * Vector3.up);
+        transform.LookAt(transform.position + transfCamera.transform.rotation * Vector3.forward, transfCamera.transform.rotation * Vector3.up); // What is this for?
     }
 }
