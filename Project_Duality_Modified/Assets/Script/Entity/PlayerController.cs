@@ -60,6 +60,9 @@ public class PlayerController : Entity
 
     private GameObject basePlayer;
 
+    // ADDED
+    float m_currentTilt = 0;
+
     void Start()
     {
         rb = this.GetComponent<Rigidbody>();
@@ -72,7 +75,7 @@ public class PlayerController : Entity
     {
         delta = Time.deltaTime;
 
-        onGround = Physics.CheckCapsule(vault.bounds.center,
+        onGround = Physics.CheckCapsule(vault.bounds.center, // Check on ground for jumping or falling
         new Vector3(vault.bounds.center.x, vault.bounds.min.y, vault.bounds.center.z),
         vault.radius * 0.9f, gMask, QueryTriggerInteraction.Ignore);
 
@@ -85,10 +88,8 @@ public class PlayerController : Entity
 
     void HandleInput()
     {
-        inputX = Input.GetAxisRaw("Vertical");
-        inputY = Input.GetAxisRaw("Horizontal");
-
-        direction = (pivotCam.forward * inputX + pivotCam.right * inputY).normalized; // This handles movement direction
+        inputX = Input.GetAxisRaw("Vertical"); // W + S Movement
+        inputY = Input.GetAxisRaw("Horizontal"); // A + D Movement
 
         Ray camR = Camera.main.ScreenPointToRay(Input.mousePosition);  // This gives the look direction and angle, but the actual angle seems to be off for shooting
         RaycastHit hit;
@@ -100,24 +101,33 @@ public class PlayerController : Entity
         {
             intButton.SetActive(true); // This displays the F (or interact key) when near an interactable object?
 
-            if (Input.GetKeyDown(KeyCode.F))  // I have not found an object to be interacted with yet
+            if (Input.GetKeyDown(KeyCode.F))
                 _obj.Interact();
         }
         else
             intButton.SetActive(false);
 
-        Physics.Raycast(camR, out hit, Mathf.Infinity, aMask);
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
+
+        //m_currentTilt -= mouseY * 3f;
+        //pivotCam.transform.localEulerAngles = new Vector3(Mathf.Clamp(m_currentTilt, -20, 60), 0, 0);
+        //pivotCam.transform.Rotate(0, mouseX * 3f, 0);  // Rotate around the Y axis
+
+        direction = (pivotCam.forward * inputX + pivotCam.right * inputY).normalized; // This handles Player model movement direction
+
+        /*Physics.Raycast(camR, out hit, Mathf.Infinity, aMask);
         var lookPos = new Vector3(hit.point.x, gfx.transform.position.y, hit.point.z);
-        gfx.transform.LookAt(lookPos, Vector3.up);  // This seems to turn the player model to the mouse pointer
+        gfx.transform.LookAt(lookPos, Vector3.up);  // Rotate player model toward mouse pointer
 
         //Rotaciona a camera - Rotation of camera
-        if (Input.GetMouseButton(2))
+        /*if (Input.GetMouseButton(2))
         {
             camInputX = Input.GetAxisRaw("Mouse X");
 
-            camRotation += new Vector3(0, camInputX * 100f * delta);
+            camRotation += new Vector3(0, camInputX * 100f * delta); // Rotate camera around the Y axis if middle mouse wheel is pressed
             pivotCam.rotation = Quaternion.Euler(camRotation);
-        }
+        } // */
 
         //Atirar - Shoot
         if (Input.GetMouseButton(0))  // Would be nice to have some sort of UI element for showing remaining bullets
