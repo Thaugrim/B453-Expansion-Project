@@ -61,7 +61,7 @@ public class PlayerController : Entity
     private GameObject basePlayer;
 
     // ADDED
-    float m_currentTilt = 0;
+    [SerializeField] private GameObject mainCam;
 
     void Start()
     {
@@ -91,7 +91,7 @@ public class PlayerController : Entity
         inputX = Input.GetAxisRaw("Vertical"); // W + S Movement
         inputY = Input.GetAxisRaw("Horizontal"); // A + D Movement
 
-        Ray camR = Camera.main.ScreenPointToRay(Input.mousePosition);  // This gives the look direction and angle, but the actual angle seems to be off for shooting
+        Ray camR = Camera.main.ScreenPointToRay(Input.mousePosition);  // This is used for interactive objects
         RaycastHit hit;
 
         Physics.Raycast(camR, out hit);
@@ -110,11 +110,13 @@ public class PlayerController : Entity
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
-        //m_currentTilt -= mouseY * 3f;
-        //pivotCam.transform.localEulerAngles = new Vector3(Mathf.Clamp(m_currentTilt, -20, 60), 0, 0);
-        //pivotCam.transform.Rotate(0, mouseX * 3f, 0);  // Rotate around the Y axis
+        //direction = (pivotCam.forward * inputX + pivotCam.right * inputY).normalized; // This handles Player model movement direction
+        direction = (mainCam.transform.forward * inputX + mainCam.transform.right * inputY).normalized; // This handles Player model movement direction
+        direction.y = 0;  // remove the vertical access
 
-        direction = (pivotCam.forward * inputX + pivotCam.right * inputY).normalized; // This handles Player model movement direction
+       
+        Vector3 camPos = new Vector3(mainCam.transform.position.x, 0, mainCam.transform.position.z);
+        gfx.transform.rotation = Quaternion.LookRotation(gfx.transform.position - camPos);  // Helped with the math of looking away from camera https://answers.unity.com/questions/566404/why-does-lookat-look-away.html
 
         /*Physics.Raycast(camR, out hit, Mathf.Infinity, aMask);
         var lookPos = new Vector3(hit.point.x, gfx.transform.position.y, hit.point.z);
@@ -175,7 +177,7 @@ public class PlayerController : Entity
                 else
                     this.transform.position += direction * speed * delta;
 
-                Quaternion target = Quaternion.Euler(inputX * 30f, 0, inputY * 30f);
+                Quaternion target = Quaternion.Euler(inputX * 30f, 0, inputY * 30f); // Magic numbers
                 basePlayer.transform.rotation = basePlayer.transform.rotation * Quaternion.Slerp(basePlayer.transform.rotation, target, Time.deltaTime); // Smooth movement to position
             }
         }

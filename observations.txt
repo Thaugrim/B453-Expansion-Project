@@ -1,0 +1,4 @@
+Physics are wierdly floaty when it comes to jumping.
+Enemies are stationary.
+Cannot jump while moving.
+No indication that the player needs to reload - bullets just stop shooting at a certain point.

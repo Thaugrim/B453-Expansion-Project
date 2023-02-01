@@ -33,6 +33,9 @@ public class GameController : Interactive
 
     void Start()
     {
+        // Added to lock Cursor
+        Cursor.lockState = CursorLockMode.Locked;
+
         sExplosion = explosion;
         sFire = fire;
 
