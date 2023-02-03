@@ -62,6 +62,10 @@ public class PlayerController : Entity
 
     // ADDED
     [SerializeField] private GameObject mainCam;
+    [SerializeField] public bool is_boosted = false;
+    [SerializeField] public GameObject[] bullets;
+    private float firing_speed = 0.5f;
+
 
     void Start()
     {
@@ -146,7 +150,9 @@ public class PlayerController : Entity
             _bullet.SetGroup(this.group);
             _bullet.Impulse(gfx.transform.forward);
 
-            bulletsCount -= 1;
+            if (!is_boosted)
+                bullets[((int)bulletsCount) - 1].SetActive(false);
+                bulletsCount -= 1;
         }
 
         //Escudo - Shield
@@ -229,6 +235,7 @@ public class PlayerController : Entity
         while (bulletsCount < maxBullets)
         {
             bulletsCount += 1;
+            bullets[((int)bulletsCount) - 1].SetActive(true);  // Added for reload indicator
             yield return new WaitForSeconds(3f);
         }
 
@@ -243,7 +250,7 @@ public class PlayerController : Entity
     IEnumerator CanShoot() // Shot delay 0.5 seconds
     {
         canShoot = false;
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(firing_speed);  // Changed for power up bonus
         canShoot = true;
     }
 
@@ -288,6 +295,22 @@ public class PlayerController : Entity
 
         if (lifeSlide)
             lifeSlide.value = life;
+    }
+
+    public void PowerUp()
+    {
+        StartCoroutine("Boost");
+    }
+
+    IEnumerator Boost()
+    {
+        bulletsCount = 5;
+        canShoot = true;
+        is_boosted = true;
+        firing_speed = 0.2f;
+        yield return new WaitForSeconds(10f);
+        is_boosted = false;
+        firing_speed = 0.5f;
     }
 
     public void CollectOrb()
